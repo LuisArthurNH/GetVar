@@ -29,7 +29,6 @@ m1   = OMEditVar1(CSV_path)
 ############################################################################
 
 e = type('error', (object,), {})()
-new_var = 1
 
 # Error Betas:
 e.beta_atual = m.pitchControl1_beta_atual - p.beta_atual
