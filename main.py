@@ -16,12 +16,9 @@ p  = PSCADVar(INF_path, writecsv = False)
 
 
 # OMEdit PATH: Defines the path of .CSV file
-CSV_path = r"C:\Users\Luis Arthur\Desktop\Modelica\LUIS\moFiles\WECSlibrary_OMedit.Examples.Example1\omedit.csv"
-m   = OMEditVar(CSV_path, interp = p.time)
-
-# # DyMat
+# CSV_path = r"C:\Users\Luis Arthur\Desktop\Modelica\LUIS\moFiles\WECSlibrary_OMedit.Examples.Example1\omedit.csv"
 CSV_path = r"C:\Users\Luis Arthur\Desktop\Modelica\LUIS\moFiles\WECSlibrary_OMedit.Examples.Example1\omedit.mat"
-# m   = OMEditVar1(CSV_path, interp = p.time)
+m   = OMEditVar(CSV_path, interp = p.time)
 
 
 ############################################################################
