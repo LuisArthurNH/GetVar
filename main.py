@@ -21,7 +21,7 @@ m   = OMEditVar(CSV_path, interp = p.time)
 
 # # DyMat
 CSV_path = r"C:\Users\Luis Arthur\Desktop\Modelica\LUIS\moFiles\WECSlibrary_OMedit.Examples.Example1\omedit.mat"
-m1   = OMEditVar1(CSV_path)
+# m   = OMEditVar1(CSV_path, interp = p.time)
 
 
 ############################################################################

@@ -85,17 +85,17 @@ class OMEditVar(object):
 
         ############################################################################
         # Interpolate OMEDit Variables with the PSCAD Time variable, if its the case
-        # and then storage it in a variable with it's name
+        # and then storage it in a variable with its name
         ############################################################################
 
-        if type(kwargs['interp']) is not int: # if it is not and integer, it is the 
+        if type(kwargs['interp']) is not int: # Means the kwarg is a vector 
             df1 = pd.DataFrame()    # A X sized DataFrame can't receive a Y sized df, so a new one is created
 
             for ii in range(0,n_var):
                 if ii == 0:
                     df1[header_orig[ii]] = x_func
                 else:
-                    f_lin = interp1d(df[header_orig[0]], df[header_orig[ii]])
+                    f_lin = interp1d(df[header_orig[0]], df[header_orig[ii]]) # x = OMEdit time, y = the variable
                     df1[header_orig[ii]] = f_lin(x_func)
 
                 exec('%s = np.array(%s)' % (header[ii],'df1[header_orig[ii]]'))

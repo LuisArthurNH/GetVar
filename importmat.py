@@ -34,16 +34,32 @@ class OMEditVar1(object):
     def __init__(self,CSV_path,**kwargs):
 
 
+        try:                                 # if the kwarg exist, create a variable called x_func
+           kwargs['interp']
+           self.time = kwargs['interp']
+        except KeyError:                     # if it doesn't exist:
+            kwargs['interp'] = 0
+
         d = DyMat.DyMatFile(CSV_path)
 
         n_var = len(d.names())
         header = [0]*n_var
 
+        vec = []
+
         for a in range(0,n_var):
             header[a] = "self." + d.names()[a].replace(".","_")
             header[a] = header[a].replace("(","_")
             header[a] = header[a].replace(")","_")
+            
+            if type(kwargs['interp']) is not int: # Means it is a vector
 
-            exec('%s = np.array(%s)' % (header[a],'d.data(d.names()[a])'))
+                f_lin = interp1d(d.abscissa(d.names()[a])[0], d.data(d.names()[a]))
+                vec = f_lin(self.time)
+                exec('%s = np.array(%s)' % (header[a],'vec'))
+
+
+            else:    
+                exec('%s = np.array(%s)' % (header[a],'d.data(d.names()[a])'))
 
         a = 1
