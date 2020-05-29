@@ -7,6 +7,7 @@ import math
 import pandas as pd
 import numpy as np
 from scipy.interpolate import interp1d
+import DyMat 
 
 
 ###########################################################################
@@ -37,7 +38,8 @@ class OMEditVar(object):
 
         try:                                 # if the kwarg exist, create a variable called x_func
            kwargs['interp']
-           x_func = kwargs['interp']
+           x_func    = kwargs['interp']
+           self.time = kwargs['interp']
         except KeyError:                     # if it doesn't exist:
             kwargs['interp'] = 0
 
@@ -47,63 +49,86 @@ class OMEditVar(object):
             kwargs['replaceDot'] = True
 
 
-        df = pd.read_csv(CSV_path)           # Read the .OUT file and storage it in a pandas data frame
+        if ".csv" in CSV_path:                   # User enters with an CSV file
+            df = pd.read_csv(CSV_path)           # Read the .OUT file and storage it in a pandas data frame
 
-        header = df.columns                  # Header that will be modified to create object variables
-        header_orig = df.columns             # Original header, just like it is in modelica
-        n_var = len(df.columns)              # Number of variables
+            header = df.columns                  # Header that will be modified to create object variables
+            header_orig = df.columns             # Original header, just like it is in modelica
+            n_var = len(df.columns)              # Number of variables
 
-        aa = ""                              # Add "nothing" to the variables' names and
-        header = [aa + s for s in header]    # Now it is a list of strings
+            aa = ""                              # Add "nothing" to the variables' names and
+            header = [aa + s for s in header]    # Now it is a list of strings
 
-        count = [0]*n_var                    # Storage the number of . in a variable's name
+            count = [0]*n_var                    # Storage the number of . in a variable's name
 
-        for ii in range(0,n_var):
-            if kwargs['replaceDot'] == True:      # replaces . with _
-                for jj in header[ii]:
+            for ii in range(0,n_var):
+                if kwargs['replaceDot'] == True:      # replaces . with _
+                    for jj in header[ii]:
+                            if jj == ".":
+                                header[ii] = header[ii].replace(".","_")
+                            elif jj == ")":
+                                header[ii] = header[ii].replace(")","_")
+                            elif jj == "(":
+                                header[ii] = header[ii].replace("(","_")
+                else:
+                    for jj in header[ii]:
                         if jj == ".":
-                            header[ii] = header[ii].replace(".","_")
+                            count[ii] = count[ii] + 1
                         elif jj == ")":
                             header[ii] = header[ii].replace(")","_")
                         elif jj == "(":
-                            header[ii] = header[ii].replace("(","_")
+                            header[ii] = header[ii].replace("(","_")                        
+                    for kk in range(0,count[ii]):            
+                        header[ii] = re.sub(r'^.*?\.',"",header[ii])   # Takes everything before the . and replace with nothing
+
+
+            h_str = "self."                             # Add "nothing" to the variables names and
+            header = [h_str + s for s in header]        # now it is a list of strings
+
+
+            ############################################################################
+            # Interpolate OMEDit Variables with the PSCAD Time variable, if its the case
+            # and then storage it in a variable with its name
+            ############################################################################
+
+            if type(kwargs['interp']) is not int: # Means the kwarg is a vector 
+                df1 = pd.DataFrame()    # A X sized DataFrame can't receive a Y sized df, so a new one is created
+
+                for ii in range(0,n_var):
+                    if ii == 0:
+                        df1[header_orig[ii]] = x_func
+                    else:
+                        f_lin = interp1d(df[header_orig[0]], df[header_orig[ii]]) # x = OMEdit time, y = the variable
+                        df1[header_orig[ii]] = f_lin(x_func)
+
+                    exec('%s = np.array(%s)' % (header[ii],'df1[header_orig[ii]]'))
             else:
-                for jj in header[ii]:
-                    if jj == ".":
-                        count[ii] = count[ii] + 1
-                    elif jj == ")":
-                        header[ii] = header[ii].replace(")","_")
-                    elif jj == "(":
-                         header[ii] = header[ii].replace("(","_")                        
-                for kk in range(0,count[ii]):            
-                    header[ii] = re.sub(r'^.*?\.',"",header[ii])   # Takes everything before the . and replace with nothing
+                for ii in range(0,n_var):
+                    exec('%s = np.array(%s)' % (header[ii],'df[header_orig[ii]]'))
+
+        else:                                 # If user enters with a .MAT file
+
+            d = DyMat.DyMatFile(CSV_path)
+
+            n_var = len(d.names())
+            header = [0]*n_var
+
+            vec = []
+
+            for a in range(0,n_var):
+                header[a] = "self." + d.names()[a].replace(".","_")
+                header[a] = header[a].replace("(","_")
+                header[a] = header[a].replace(")","_")
+                
+                if type(kwargs['interp']) is not int:           # Means it is an interpolation vector
+
+                    f_lin = interp1d(d.abscissa(d.names()[a])[0], d.data(d.names()[a]))
+                    vec = f_lin(self.time)
+                    exec('%s = np.array(%s)' % (header[a],'vec'))
 
 
-        h_str = "self."                             # Add "nothing" to the variables names and
-        header = [h_str + s for s in header]        # now it is a list of strings
-
-
-        ############################################################################
-        # Interpolate OMEDit Variables with the PSCAD Time variable, if its the case
-        # and then storage it in a variable with it's name
-        ############################################################################
-
-        if type(kwargs['interp']) is not int: # if it is not and integer, it is the 
-            df1 = pd.DataFrame()    # A X sized DataFrame can't receive a Y sized df, so a new one is created
-
-            for ii in range(0,n_var):
-                if ii == 0:
-                    df1[header_orig[ii]] = x_func
-                else:
-                    f_lin = interp1d(df[header_orig[0]], df[header_orig[ii]])
-                    df1[header_orig[ii]] = f_lin(x_func)
-
-                exec('%s = np.array(%s)' % (header[ii],'df1[header_orig[ii]]'))
-        else:
-            for ii in range(0,n_var):
-                exec('%s = np.array(%s)' % (header[ii],'df[header_orig[ii]]'))
-
-        a = 0
+                else:    
+                    exec('%s = np.array(%s)' % (header[a],'d.data(d.names()[a])'))
         
 
 
