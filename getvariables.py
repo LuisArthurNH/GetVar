@@ -115,20 +115,22 @@ class OMEditVar(object):
 
             vec = []
 
+            header_lst = list(d.names())
+
             for a in range(0,n_var):
-                header[a] = "self." + d.names()[a].replace(".","_")
+                header[a] = "self." + header_lst[a].replace(".","_")
                 header[a] = header[a].replace("(","_")
                 header[a] = header[a].replace(")","_")
                 
                 if type(kwargs['interp']) is not int:           # Means it is an interpolation vector
 
-                    f_lin = interp1d(d.abscissa(d.names()[a])[0], d.data(d.names()[a]))
+                    f_lin = interp1d(d.abscissa(header_lst[a])[0], d.data(header_lst[a]))
                     vec = f_lin(self.time)
                     exec('%s = np.array(%s)' % (header[a],'vec'))
 
 
                 else:    
-                    exec('%s = np.array(%s)' % (header[a],'d.data(d.names()[a])'))
+                    exec('%s = np.array(%s)' % (header[a],'d.data(header_lst[a])'))
         
 
 

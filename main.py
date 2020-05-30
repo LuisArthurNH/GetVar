@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
 from getvariables import PSCADVar, OMEditVar
-from importmat import OMEditVar1
 
 
 # Check help(PSCADVar)  if necessary
