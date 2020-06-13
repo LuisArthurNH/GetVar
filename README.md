@@ -13,5 +13,5 @@ __________________
 **Requirements**
 
 - **Python 3.8**
-- **Packages**: all of them are listed at "requirements.txt"
+- **Packages**: all of them are listed in "requirements.txt"
   - To install all of them use: **pip install -r requirements.txt**
