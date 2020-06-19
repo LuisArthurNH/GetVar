@@ -257,8 +257,14 @@ class PSCADVar(object):
         OUT_path  = [0] * n_files
 
         for ii in range(0, n_files):
-            OUT_name[ii] = "_0" + str(ii + 1) + ".out"             # Create ending "_0ii".out
-            OUT_path[ii] = INF_path.replace(".inf", OUT_name[ii])  # replace in INF_path the.inf for the new end
+            if ii < 9:
+                OUT_name[ii] = "_0" + str(ii + 1) + ".out"             # Create ending "_0ii".out
+                OUT_path[ii] = INF_path.replace(".inf", OUT_name[ii])  # replace in INF_path the.inf for the new end
+            else:
+                
+                OUT_name[ii] = "_" + str(ii + 1) + ".out"             # Create ending "_0ii".out
+                OUT_path[ii] = INF_path.replace(".inf", OUT_name[ii])  # replace in INF_path the.inf for the new end
+
 
             # print CSV_path[ii]
 
