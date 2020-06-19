@@ -154,7 +154,7 @@ class OMEditVar(object):
 
 class PSCADVar(object):
     """ Documentation: 
-        This class reads the .out files and storages all the variables in it contained.
+        This class reads the .out files and returns all of the variables in it contained, as well as the header of the variables, time step and number of variables imported.
 
         INF_path: str, mandatory. 
         It's the path of the .inf file
@@ -199,6 +199,7 @@ class PSCADVar(object):
         n_var_last = n_var_tot -(n_files-1)*n_col  # Number of variables in the last file
         n_var_exp = n_var + 1                      # Number of variables that will be exported 
 
+        self.number_var = n_var_exp                
 
         # This "for" gets the number of columns of every file which will be all 11,
         # but the last, which value can vary
